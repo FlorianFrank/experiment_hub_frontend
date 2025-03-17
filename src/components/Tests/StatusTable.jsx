@@ -35,7 +35,7 @@ const StatusTable = (props) => {
   if (data.length === 0) return <p>No repos, sorry</p>;
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
+      <Table sx={{ minWidth: 500 }} aria-label="customized table">
         <TableHead>
           <TableRow>
             <StyledTableCell>ID</StyledTableCell>

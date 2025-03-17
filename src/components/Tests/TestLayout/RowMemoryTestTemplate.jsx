@@ -18,7 +18,12 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 import {useStateContext} from '../../../contexts/ContextProvider';
-import {BACKEND_IP_ADDRESS, FETCH_DELETE_CNT_TEST_TEMPLATE, FETCH_DELETE_MEMORY_TEST_TEMPLATE} from '../../../config'
+import {
+    BACKEND_IP_ADDRESS,
+    FETCH_DELETE_CNT_TEST_TEMPLATE,
+    FETCH_DELETE_MEMORY_TEST_TEMPLATE,
+    FETCH_SCHEDULE_TEST
+} from '../../../config'
 
 import {
     memoryTypes,
@@ -26,14 +31,15 @@ import {
     MRAMModels,
     FRAMModels
 } from '../../../data/navbar_config';
-import {fetch_delete} from "../../Utils/AuthenticationUtils";
+import {fetch_delete, fetch_post} from "../../Utils/AuthenticationUtils";
 import Alert from "@mui/material/Alert";
+import {triggerStartTestToast} from "../../Utils/ToastManager";
 
 const RowMemoryTestTemplate = (props) => {
     const {row} = props;
     const {testTemplates, setTestTemplates} = useStateContext();
 
-    const {connectedDevices} = useStateContext();
+    const {devices} = useStateContext();
     const [open, setOpen] = useState(false);
     const [response, setResponse] = useState(null);
     //const [connectedDevices, setConnectedDevices] = useState([]);
@@ -87,7 +93,7 @@ const RowMemoryTestTemplate = (props) => {
     const startTest = async (id) => {
         console.log('🚀 ~ file: RowMemoryTestTemplate.jsx:58 ~ startTest ~ id:', id);
 
-        const selectedDevice = connectedDevices.find(
+        const selectedDevice = devices.find(
             (device) => device.id.toString() === selectedDeviceId.toString()
         );
 
@@ -97,23 +103,20 @@ const RowMemoryTestTemplate = (props) => {
             deviceData: selectedDevice,
             memoryData: values
         };
-        console.log(combinedData);
 
-        const fetchStr = 'http://' + BACKEND_IP_ADDRESS + ':8088/startTest'
-        try {
-            const res = await fetch(fetchStr, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(combinedData)
-            });
-            const json = await res.json();
-            setResponse(json);
-            console.log(response);
-            //navigate('/tests/waiting');
-        } catch (err) {
-            alert(fetchStr)
-        }
+
+        fetch_post(FETCH_SCHEDULE_TEST + '?testCategory=memory', (value) => {
+            setAlertIsSet(value)
+        }, (value) => {
+            setAlertMessage(value)
+        }, combinedData).then((data) => {
+            if (data) {
+                setResponse(data);
+                console.log(response);
+            }
+        })
     };
+
 
     const validate = () => {
         let newErrors = {};
@@ -241,11 +244,11 @@ const RowMemoryTestTemplate = (props) => {
                                 </TableHead>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell align="left">{row.startAddress}</TableCell>
-                                        <TableCell align="left">{row.stopAddress}</TableCell>
-                                        <TableCell align="left">{row.voltage}</TableCell>
+                                        <TableCell align="left">{row['startAddress']}</TableCell>
+                                        <TableCell align="left">{row['stopAddress']}</TableCell>
+                                        <TableCell align="left">{row['supplyVoltage']}</TableCell>
                                         <TableCell align="left">{row.temperature}</TableCell>
-                                        <TableCell align="left">{row.dataSetupTime}</TableCell>
+                                        <TableCell align="left">{row['writeValue']}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
@@ -356,10 +359,10 @@ const RowMemoryTestTemplate = (props) => {
                                     value={selectedDeviceId}
                                     onChange={handleOptionChange}
                                 >
-                                    <option value=""></option>
-                                    {connectedDevices.map((device) => (
+                                    <option value="Select Board"/>
+                                    {devices.filter(device => device.type === 'nanosec_container' && device.status === 'online').map(device => (
                                         <option key={device.id} value={device.id}>
-                                            {device.device_label}
+                                            {device.name}
                                         </option>
                                     ))}
                                 </select>
@@ -371,7 +374,11 @@ const RowMemoryTestTemplate = (props) => {
                                     }`}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        startTest(row.id);
+
+                                        startTest(row.id).catch((errorMsg) => {
+                                            console.log('Error while calling startTest: ', errorMsg)
+                                        })
+                                        triggerStartTestToast(row)
                                     }}
                                     disabled={selectedDeviceId === ''}
                                 >

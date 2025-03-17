@@ -21,7 +21,7 @@ import Alert from '@mui/material/Alert';
 import {triggerStartTestToast} from "../../Utils/ToastManager";
 import {fetch_delete, fetch_post} from "../../Utils/AuthenticationUtils";
 import {useStateContext} from "../../../contexts/ContextProvider";
-import {FETCH_DELETE_CNT_TEST_TEMPLATE} from "../../../config";
+import {FETCH_DELETE_CNT_TEST_TEMPLATE, FETCH_SCHEDULE_TEST} from "../../../config";
 
 
 const INVALID_SELECTION = -1;
@@ -70,7 +70,7 @@ const RowCNTTestTemplate = ({row}) => {
                 if (data.status === 'ok') {
                     let newTemplateList = []
                     testTemplates.forEach((elem) => {
-                        if (!(elem['id'] === row.id && elem['category'] === 'cntpuf')) {
+                        if (!(elem['id'] === row.id && elem['category'] === 'cnt_puf')) {
                             newTemplateList.push(elem)
                         }
                     })
@@ -100,7 +100,7 @@ const RowCNTTestTemplate = ({row}) => {
         };
         console.log(combinedData);
 
-        fetch_post(FETCH_DELETE_CNT_TEST_TEMPLATE + row.id, (value) => {
+        fetch_post(FETCH_SCHEDULE_TEST + '?testCategory=cnt_puf', (value) => {
             setAlertIsSet(value)
         }, (value) => {
             setAlertMessage(value)
@@ -264,12 +264,12 @@ const RowCNTTestTemplate = ({row}) => {
                                 </TableHead>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell align="left">{row['vds_min']}</TableCell>
-                                        <TableCell align="left">{row['vds_max']}</TableCell>
-                                        <TableCell align="left">{row['vds_step']}</TableCell>
-                                        <TableCell align="left">{row['vgs_min']}</TableCell>
-                                        <TableCell align="left">{row['vgs_max']}</TableCell>
-                                        <TableCell align="left">{row['vgs_step']}</TableCell>
+                                        <TableCell align="left">{row['minimalSourceDrainVoltage']}</TableCell>
+                                        <TableCell align="left">{row['maximalSourceDrainVoltage']}</TableCell>
+                                        <TableCell align="left">{row['numberOfDifferentSourceDrainVoltages']}</TableCell>
+                                        <TableCell align="left">{row['minimalGateVoltage']}</TableCell>
+                                        <TableCell align="left">{row['maximalGateVoltage']}</TableCell>
+                                        <TableCell align="left">{row['numberOfPointsPerSourceDrainVoltage']}</TableCell>
                                         <TableCell align="left">{row['iterations']}</TableCell>
                                         <TableCell align="left">{row['temperature']}</TableCell>
                                         <TableCell align="left">{row['hysteresis'] ? 'true' : 'false'}</TableCell>

@@ -67,16 +67,16 @@ const DeviceTable = () => {
         contextMenuItems={contextMenuItems}
     >
         <ColumnsDirective>
-            <ColumnDirective headerText="Device Id" width="90" textAlign="Center" field="ID"/>
-            <ColumnDirective headerText="Name" width="120" textAlign="Center" field="Name"/>
-            <ColumnDirective headerText="Type" width="120" textAlign="Center" field="Type"/>
-            <ColumnDirective headerText="Protocol" width="120" textAlign="Center" field="Protocol"/>
-            <ColumnDirective headerText="Port" width="120" textAlign="Center" field="Port"/>
-            <ColumnDirective headerText="Status" width="120" textAlign="Center" field="Status"/>
-            <ColumnDirective headerText="Test" width="120" textAlign="Center" field="Test"/>
+            <ColumnDirective headerText="ID" width="50" textAlign="Center" field="ID"/>
+            <ColumnDirective headerText="Name" width="90" textAlign="Center" field="Name"/>
+            <ColumnDirective headerText="Type" width="50" textAlign="Center" field="Type"/>
+            <ColumnDirective headerText="Protocol" width="70" textAlign="Center" field="Protocol"/>
+            <ColumnDirective headerText="Port" width="110" textAlign="Center" field="Port"/>
+            <ColumnDirective headerText="Status" width="70" textAlign="Center" field="Status"/>
+            <ColumnDirective headerText="Test" width="50" textAlign="Center" field="Test"/>
             <ColumnDirective
                 headerText="More Information"
-                width="120"
+                width="100"
                 textAlign="Center"
                 field="Additional"
             />

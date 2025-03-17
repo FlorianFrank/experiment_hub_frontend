@@ -5,6 +5,7 @@ import nanosec_matrix from '../../assets/devices/nanosec_matrix.jpg';
 import microcontroller_raspberry_pi_3 from '../../assets/devices/microcontroller_raspberry_pi_3.png';
 import oscilloscope_keysight_3000a from '../../assets/devices/oscilloscope_keysight_3000a.png';
 import smu_keithley_2600b from '../../assets/devices/smu_keithley_2600b.png';
+import keysight_33500b from '../../assets/devices/signal_generator_keysight_33500B.png';
 import diglent_atlys from '../../assets/devices/fpga_digilent_atlys.png';
 
 
@@ -47,7 +48,8 @@ function selectDeviceFigure(deviceIdentifier, type) {
         return diglent_atlys
     if (type === 'SMU')
         return smu_keithley_2600b
-
+    if (type === 'Signal Generator' || type === 'signal_generator')
+        return keysight_33500b
     if (type === 'Microcontroller')
         return microcontroller_raspberry_pi_3
 

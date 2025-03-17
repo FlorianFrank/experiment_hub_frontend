@@ -57,13 +57,14 @@ const Login = () => {
             localStorage.setItem('current_user', username);
             axios.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
 
-            navigate('/overview');
-
             try {
                 await axios.get(FETCH_START_NATS);
+                console.log("Fetch nats start")
             } catch (e) {
                 showAlert('error', 'NATS service not started');
             }
+
+            navigate('/overview');
 
             setAlert('');
         } catch (e) {

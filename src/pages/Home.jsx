@@ -24,6 +24,7 @@ import DeviceInfo from "../components/Devices/DeviceInfo";
 import WaferOverview from "../components/Evaluation/EvaluationResults/CNTs/WaferPlotter/WaferOverview";
 import AddDevice from "../components/Devices/AddDevice";
 import TestsStateWrapper from "../components/Tests/TestsStateWrapper";
+import TestsStateDetails from "../components/Tests/TestsStateDetails";
 
 const Home = () => {
 
@@ -76,6 +77,8 @@ const Home = () => {
                         <Route path="/versionInfo" element={<VersionInfo/>}/>
                         <Route path="/uploadMeasurments" element={<Upload/>}/>
                         <Route path="/deviceInfo" element={<DeviceInfo/>}/>
+                        <Route path="/testStateInfo" element={<TestsStateDetails/>}/>
+
                         <Route path="/addDevice" element={<AddDevice/>}/>
                         {/**TESTS */}
                         <Route path="/tests" element={<TestsPage/>}/>

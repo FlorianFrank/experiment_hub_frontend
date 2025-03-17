@@ -22,7 +22,7 @@ const WaferOverview = () => {
                 'Nr. Non-Conductive', 'Nr. Semi-Conductive', 'Nr. Faulty cells', 'Hamming Weight']}
             resultKeyList={['wafer', 'row', 'column', 'pufID', 'nrSelectedCells', 'nrConductiveCells',
                 'nrNonConductiveCells', 'nrSemiConductiveCells', 'nrErrorCells', 'hammingWeight']}
-            visualization_height={1200} visualization_width={1600}/>
+            visualization_height={window.innerHeight*0.7} visualization_width={window.innerHeight*0.9}/>
     );
 };
 
