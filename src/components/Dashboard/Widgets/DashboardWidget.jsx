@@ -33,7 +33,7 @@ export default function DashboardWidget({
 
     return (
         <div className={classes['widgetWrapper']} style={style && {...style}}>
-            <Paper className={classes['paper']} classes={{
+            <Paper className={classes['paper']} style={{background: 'transparent', boxShadow: 'none'}} classes={{
                 root: classnames(classes['widgetRoot'], {
                     [classes['noWidgetShadow']]: noWidgetShadow
                 })

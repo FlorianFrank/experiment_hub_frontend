@@ -5,7 +5,6 @@ import useStyles from "./components/style";
 
 import AddWidgetMenu from "./components/AddWidgetMenu";
 import {
-    ServerPerformanceWidget,
     ServerInfoWidget,
     DevicesWidget,
     TestExecutionTableWidget,
@@ -31,12 +30,7 @@ const Dashboard = () => {
             [{
                 id: 0,
                 widget: ServerInfoWidget(() => handleDelete(1), classes),
-                colspan: 3,
-                rowspan: 1
-            }, {
-                id: 1,
-                widget: ServerPerformanceWidget(() => handleDelete(1), classes),
-                colspan: 3,
+                colspan: 6,
                 rowspan: 1
             }
             ],
@@ -81,14 +75,7 @@ const Dashboard = () => {
 
         const addWidget = (title, row, colspan) => {
             let widget = null
-            if (title === 'Performance Widget') {
-                widget = {
-                    id: widgetIDCtr,
-                    widget: ServerPerformanceWidget(() => handleDelete(widgetIDCtr), classes),
-                    colspan: colspan,
-                    rowspan: 1
-                }
-            } else if (title === 'Server Info Widget') {
+            if (title === 'Server Info Widget') {
 
                 widget = {
                     id: widgetIDCtr,
