@@ -20,6 +20,7 @@ import Alert from '@mui/material/Alert';
 
 import {triggerStartTestToast} from "../../Utils/ToastManager";
 import {fetch_delete, fetch_post} from "../../Utils/AuthenticationUtils";
+import {formatFieldName} from "../../Utils/FormatUtils";
 import {useStateContext} from "../../../contexts/ContextProvider";
 import {FETCH_DELETE_CNT_TEST_TEMPLATE, FETCH_SCHEDULE_TEST} from "../../../config";
 
@@ -143,19 +144,19 @@ const RowGenericTestTemplate = ({row}) => {
                 }
             });
             if ((propertyKey === 'columnsOnPUF' || propertyKey === 'rowsOnPUF') && propertyList.length > 0)
-                return propertyList[0] // TODO ned ganz sauber
+                return [propertyList[0]];
             return propertyList;
         };
 
         console.log("PROP ", property)
         let list_properties = property
 
-       /* switch (property) {
+        switch (property) {
             case 'columnsOnPUF':
-                list_properties = ['all'].concat(getPropertyList('columnsOnPUF'));
+                list_properties = ['all', ...getPropertyList('columnsOnPUF')];
                 break;
             case 'rowsOnPUF':
-                list_properties = ['all'].concat(getPropertyList('rowsOnPUF'));
+                list_properties = ['all', ...getPropertyList('rowsOnPUF')];
                 break;
             case 'waferIDs':
                 list_properties = getPropertyList('waferID');
@@ -170,9 +171,8 @@ const RowGenericTestTemplate = ({row}) => {
                 list_properties = getPropertyList('column');
                 break;
             default:
-                break;
+                list_properties = [];
         }
-        console.log("columnsOnPUF ", list_properties)*/
 
         if (list_properties.length === 0) {
             return <React.Fragment/>;
@@ -249,24 +249,27 @@ const RowGenericTestTemplate = ({row}) => {
                             >
                                 Characteristics
                             </Typography>
-                            <div className="grid md:grid-cols-5 md:gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-4 bg-gray-50/50 rounded-xl border border-gray-100">
+                                {row['templateFields'].map((entry) => {
+                                    if (entry['label'] === 'id' || entry['label'] === 'title') return null;
 
-                                {row['templateFields'].map((entry, index) => (
-                                    (entry['label'] !== 'id' && entry['label'] !== 'title') ?
-                                        <Table size="small" aria-label="moreInfo">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell align="left">{entry['name']}</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                <TableRow>
-                                                    <TableCell
-                                                        align="left">{row['templateFields'][index]['value']}</TableCell>
-                                                </TableRow>
-                                            </TableBody>
-                                        </Table> : ''
-                                    ))}
+                                    return (
+                                        <div key={entry['label']} className="flex flex-col min-w-0">
+                                            <Typography
+                                                variant="caption"
+                                                className="text-gray-500 font-bold lowercase tracking-normal break-words"
+                                            >
+                                                {formatFieldName(entry['name'])}
+                                            </Typography>
+                                            <Typography
+                                                variant="body2"
+                                                className="text-gray-900 font-medium mt-0.5 break-words"
+                                            >
+                                                {String(entry['value'])}
+                                            </Typography>
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             <br/>
@@ -324,7 +327,8 @@ const RowGenericTestTemplate = ({row}) => {
                                     onChange={handleOptionChange}
                                 >
                                     <option value="Select Board"/>
-                                    {devices.filter(device => device.type === 'nanosec_container' && device.status === 'online').map(device => (
+
+                                    {devices.filter(device => device.type === 'fpga' || device.type === 'nanosec_container' && device.status === 'online').map(device => (
                                         <option key={device.id} value={device.id}>
                                             {device.name}
                                         </option>

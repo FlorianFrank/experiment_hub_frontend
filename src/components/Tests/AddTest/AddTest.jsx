@@ -9,6 +9,8 @@ import {Alert} from '@mui/lab';
 import LoadingClip from '../../Utils/LoadingClip';
 import {triggerAddTestToast} from "../../Utils/ToastManager";
 import {makeStyles} from '@material-ui/core/styles';
+import {useLocation} from "react-router-dom";
+import {formatFieldName} from "../../Utils/FormatUtils";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +20,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const AddTest = ({testType, testTypeName}) => {
+const AddTest = () => {
+    let location = useLocation();
+
+    const testType = location.state?.testType || '';
+    const testTypeName = location.state?.testTypeName || '';
 
     const classes = useStyles();
 
@@ -29,7 +35,7 @@ const AddTest = ({testType, testTypeName}) => {
     const [alertMessage, setAlertMessage] = useState('')
     const [values, setValues] = useState({
         title: '',
-        testType: (testType === 'cnt_puf') ? 'transferChar' : (testType === 'memory') ? 'rowHammering' : ''
+        testType: ''
     })
     const [, setErrors] = useState({})
     const [testTypes, setTestTypes] = useState([])
@@ -52,9 +58,16 @@ const AddTest = ({testType, testTypeName}) => {
                 console.log('Fetch default test template values for test class ' + testClass)
                 fetch_get(FETCH_DEFAULT_VALUES + '?testClass=' + testClass + '&testSubclass=' + testType, (value) =>
                     setAlertIsSet(value), (value) => setAlertMessage(value)).then((retData) => {
+                    if (!retData || !retData['test_types'] || retData['test_types'].length == 0) {
+                        setAlertIsSet(true)
+                        setAlertMessage("FETCH_DEFAULT_VALUES returns empty data array")
+                        return;
+                    }
 
-                    const defaultValueList = {testType: testType}
-
+                    if (testType === '')
+                        testType = retData['test_types'][0].field
+                    
+                    const defaultValueList = { testType: testType }
                     retData['input_fields'][testType]['groups'].forEach((group) => {
                         group['fields'].forEach((field) => {
                             if (field['type'] === 'input')
@@ -90,7 +103,7 @@ const AddTest = ({testType, testTypeName}) => {
         event.preventDefault();
         try {
             if (validate()) {
-                console.log('Send Post Request:');
+                console.log('Send Post Request:' + FETCH_ADD_TEST + '?testClass=' + pufType);
 
                 await fetch_post(FETCH_ADD_TEST + '?testClass=' + pufType,
                     (value) => setAlertIsSet(value),
@@ -113,30 +126,39 @@ const AddTest = ({testType, testTypeName}) => {
 
     const handleChange = (name) => (event) => {
         console.log('🚀 ~ handleChange ~ event:', name, event.target.value);
-        setValues({...values, [name]: event.target.value})
+        setValues(prev => ({ ...prev, [name]: event.target.value }))
     };
 
     const handleChangeChecked = (name) => (event) => {
-        console.log('🚀 ~ handleChangeChecked ~ event:', name, event.target.value);
-        setValues({...values, [name]: event.target.checked})
+        console.log('🚀 ~ handleChangeChecked ~ event:', name, event.target.checked);
+        setValues(prev => ({ ...prev, [name]: event.target.checked }))
     };
 
     const defineInputField = (label, value, value_name, type, tooltip) => {
-        return <div className="flex">
-            <Tooltip title={tooltip} classes={{tooltip: classes.customTooltip}}>
-            <span style={{width: '30%'}}
-                  className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
-                  {label}
-                </span>
-            </Tooltip>
-            <input
-                type={type}
-                id="website-admin"
-                className="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                value={value}
-                onChange={handleChange(value_name)}
-            />
-        </div>
+        return (
+            <div key={value_name} className="flex flex-col space-y-1.5 min-w-0 h-full">
+                <div className="flex items-center space-x-1">
+                    <Typography 
+                        variant="caption" 
+                        className="text-gray-500 font-bold lowercase tracking-normal truncate"
+                        title={formatFieldName(label)}
+                    >
+                        {formatFieldName(label)}
+                    </Typography>
+                    {tooltip && (
+                        <Tooltip title={tooltip} classes={{tooltip: classes.customTooltip}}>
+                            <span className="text-gray-400 cursor-help text-[10px] bg-gray-100 rounded-full w-4 h-4 flex items-center justify-center">?</span>
+                        </Tooltip>
+                    )}
+                </div>
+                <input
+                    type={type}
+                    className="w-full bg-white border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 transition-all outline-none hover:border-gray-300 shadow-sm"
+                    value={value}
+                    onChange={handleChange(value_name)}
+                />
+            </div>
+        )
     }
 
 
@@ -162,22 +184,23 @@ const AddTest = ({testType, testTypeName}) => {
     }
 
     const defineCheckbox = (checkedValue, checkedValueName, title) => {
-        return <div className="flex items-center">
-            <input
-                id="bordered-checkbox-1"
-                type="checkbox"
-                value=""
-                name="bordered-checkbox"
-                className="w-4 h-4 text-blue-600 bg-gray-100"
-                checked={values[checkedValueName]}
-                onChange={handleChangeChecked(checkedValueName)}
-            />
-            <label
-                className="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-                {title}
-            </label>
-        </div>
+        return (
+            <div key={checkedValueName} className="flex items-center h-full pt-6">
+                <label className="relative inline-flex items-center cursor-pointer group">
+                    <input
+                        type="checkbox"
+                        value=""
+                        className="sr-only peer"
+                        checked={values[checkedValueName]}
+                        onChange={handleChangeChecked(checkedValueName)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 group-hover:scale-105 transition-transform"></div>
+                    <span className="ml-3 text-sm font-medium text-gray-700">
+                        {formatFieldName(title)}
+                    </span>
+                </label>
+            </div>
+        )
     }
 
     const returnRenderObject = (renderObj, testType) => {
@@ -202,20 +225,21 @@ const AddTest = ({testType, testTypeName}) => {
                 console.log('Error while calling handleSubmit: ', errorMsg)
             })
         }}>
-            <div className="relative z-0 w-full mb-6 group">
+            <div className="relative z-0 w-full mb-10 group">
                 <input
                     type="text"
                     name="floating_Title"
                     id="floating_Title"
-                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                    placeholder="Title"
+                    className="block py-4 px-0 w-full text-2xl font-bold text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer transition-all"
+                    placeholder=" "
                     onChange={handleChange('title')}
                     required
                 />
                 <label
                     htmlFor="floating_Title"
-                    className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    className="peer-focus:font-medium absolute text-lg text-gray-500 duration-300 transform -translate-y-8 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8"
                 >
+                    Test Title
                 </label>
             </div>
             <div className="grid md:grid-cols-2 md:gap-6">
@@ -227,25 +251,26 @@ const AddTest = ({testType, testTypeName}) => {
             </div>
 
             {input_groups[values.testType]['groups'].map((group) => {
-                return <React.Fragment>
-                    <Typography variant="h5" color="textSecondary" noWrap style={{marginLeft: '10px'}}>
-                        {group['name']}
+                return <div key={group['name']} className="mb-12">
+                    <Typography 
+                        variant="h6" 
+                        className="text-gray-900 font-bold mb-6 border-l-4 border-blue-500 pl-4"
+                    >
+                        {formatFieldName(group['name'])}
                     </Typography>
-                    <div className="grid grid-cols-4 gap-4 my-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 px-2">
                         {group['fields'].map((field) => {
                             if (field['type'] === 'input')
                                 return defineInputField(field['name'], values[field['label']], field['label'], field['type'], field['tooltip'])
                             if (field['type'] === 'select')
-                                return defineSelectField(values[field['label']], () => {
-                                    // TODO currently unimplemented
-                                }, field['options'])
+                                return defineSelectField(values[field['label']], handleChange(field['label']), field['options'])
                             if (field['type'] === 'checkbox')
                                 return defineCheckbox(values[field['label']], field['label'], field['name'])
                             else
-                                return <div><Alert severity="error">{field['type'] + ' undefined'}</Alert></div>
+                                return <div key={field['label']}><Alert severity="error">{field['type'] + ' undefined'}</Alert></div>
                         })}
                     </div>
-                </React.Fragment>
+                </div>
             })}
             <button
                 type="submit"

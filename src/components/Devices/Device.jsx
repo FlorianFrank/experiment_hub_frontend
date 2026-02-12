@@ -44,6 +44,7 @@ const deviceTypeMap = {
     nanosec_container: 'NanoSec Container',
     oscilloscope: 'Oscilloscope',
     smu: 'SMU',
+    signal_generator: 'Signal Generator'
 };
 
 const Device = ({id, name, type, protocol, port, status, idn, additional}) => {
@@ -52,7 +53,7 @@ const Device = ({id, name, type, protocol, port, status, idn, additional}) => {
     const navigate = useNavigate()
 
     const startTest = () => {
-        alert('Currently not supported');
+        alert("Currently not supported");
     };
 
     const GetDeviceInfo = () => (
@@ -64,7 +65,7 @@ const Device = ({id, name, type, protocol, port, status, idn, additional}) => {
                         deviceDict: [{'key': 'Type', 'value': deviceTypeJsonToStr(type)},
                             {'key': 'Protocol', 'value': deviceProtocolJsonToStr(protocol)},
                             {'key': 'Port', 'value': port},
-                            {'key': '*IDN?', 'value': idn}].concat(additional).concat([{
+                            {'key': '*IDN?', 'value': idn}].concat(JSON.parse(additional)).concat([{
                             'key': 'Status',
                             'value': status
                         }])

@@ -18,6 +18,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Card from "@mui/material/Card";
 import {Stack} from "@mui/material";
 import LinearProgressWithLabel from "../Utils/LinearProgressWithLabel";
+import {useNavigate} from "react-router-dom";
 
 const TestsStateView = ({test_state, headerBgColor}) => {
     const [alertState, setAlertState] = useState(null);
@@ -25,6 +26,7 @@ const TestsStateView = ({test_state, headerBgColor}) => {
     const [testsListRunning, setTestsListRunning] = useState([]);
     const [testsListCompleted, setTestsListCompleted] = useState([]);
     const [collapsibleOpen, setCollapsibleOpen] = useState(true);
+    const navigate = useNavigate();
 
 
     const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ const TestsStateView = ({test_state, headerBgColor}) => {
 
     let requestTests = async (test_state) => {
         const data = await
-            fetch_get(FETCH_TEST_STATE + test_state, (value) => {
+            fetch_get(FETCH_TEST_STATE + '?filter=' + test_state, (value) => {
                 setAlertIsSet(value)
             }, (value) => {
                 setAlertMessage(value)
@@ -123,6 +125,12 @@ const TestsStateView = ({test_state, headerBgColor}) => {
             return testsListCompleted;
     }
 
+    const Button = ({style, className, onClick, children}) => (
+        <button type="button" style={{...style}} className={className} onClick={onClick}>
+            {children}
+        </button>
+    );
+
     if (alertIsSet)
         return (
             <div><Alert severity="error">{alertMessage}</Alert></div>
@@ -150,6 +158,7 @@ const TestsStateView = ({test_state, headerBgColor}) => {
                                         <StyledTableCell align="left">Progress</StyledTableCell>}
                                     <StyledTableCell align="left">Iteration</StyledTableCell>
                                     <StyledTableCell align="left">Status</StyledTableCell>
+                                    <StyledTableCell align="left">More</StyledTableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -178,6 +187,22 @@ const TestsStateView = ({test_state, headerBgColor}) => {
                                         </StyledTableCell>
                                         <StyledTableCell align="left">
                                             {row.status}
+                                        </StyledTableCell>
+                                        <StyledTableCell align="left">
+                                            <Button
+                                                style={{background: 'Grey'}}
+                                                className="statusButton text-white py-1 px-2 capitalize rounded-1xl text-md"
+                                                onClick={() => navigate('/testStateInfo', {
+                                                    state: {
+                                                        id: row.id,
+                                                        title: row.title,
+                                                        testType: row.testType,
+                                                        device: row.device
+                                                    }
+                                                })}
+                                            >
+                                                More Information
+                                            </Button>
                                         </StyledTableCell>
                                     </StyledTableRow>
                                 ))}

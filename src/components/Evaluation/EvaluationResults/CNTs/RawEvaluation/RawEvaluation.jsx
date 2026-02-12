@@ -17,7 +17,7 @@ const RawEvaluation = () => {
                 stopTime={stopTime}
                 resultTableHeader={['VDS', 'Min', 'Max']}
                 resultKeyList={['vds', 'min', 'max']}
-                visualization_height={600} visualization_width={800}/>
+                visualization_height={window.innerHeight * 0.5} visualization_width={window.innerHeight * 0.5}/>
     );
 };
 

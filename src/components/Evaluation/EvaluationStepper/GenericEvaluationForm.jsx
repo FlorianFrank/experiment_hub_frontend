@@ -61,7 +61,7 @@ const GenericEvaluationForm = ({testCategory, iterations, eventHandlers, evaluat
 
 
     const fetchEvaluationConfig = async (testType) => {
-        await fetch_get(FETCH_EVALUATION_CONFIG + testType, (value) => {
+        await fetch_get(FETCH_EVALUATION_CONFIG + testType + '&testCategory=' + testCategory, (value) => {
             setAlertIsSet(value)
         }, (value) => {
             setAlertMessage(value)

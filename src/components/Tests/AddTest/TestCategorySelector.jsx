@@ -3,7 +3,6 @@ import {useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import PropTypes from 'prop-types';
 import Header from "../../HeaderFooter/Header";
-import {testClasses} from "../../../data/tests_config";
 import {FETCH_TEST_CATEGORIES} from "../../../config";
 import ClipLoader from "react-spinners/ClipLoader";
 import axios from "axios";
@@ -17,7 +16,7 @@ const override = {
 };
 const TestCategorySelector = () => {
     const navigate = useNavigate();
-    const [testType, setTestType] = useState('')
+    const [selectedTestTypeName, setSelectedTestTypeName] = useState('')
     const [testExecutionTypes, setTestExecutionTypes] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [alertIsSet, setAlertIsSet] = useState(false);
@@ -52,10 +51,20 @@ const TestCategorySelector = () => {
 
     }, [])
 
-    const navigateToNextPage = (testType) => {
-        navigate(testClasses[testType] || '/defaultRoute');
+    const navigateToNextPage = (testTypeName) => {
+        if (testTypeName === 'Script Tests')
+            navigate('/addScriptTest', testTypeName)
+        else {
+            testExecutionTypes.forEach((element) => {
+                if (element.name === testTypeName) {
+                    navigate('/addTestTemplate',
+                        {
+                            state: {testType: element.field, testTypeName: element.name}
+                        });
+                }
+            })
+        }
     };
-
     if (alertIsSet) {
         return (
             <div><Alert severity="error">{alertMessage}</Alert></div>
@@ -73,14 +82,14 @@ const TestCategorySelector = () => {
                             <select
                                 id="underline_select"
                                 className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
-                                value={testType}
+                                value={selectedTestTypeName}
                                 onChange={(event) => {
-                                    setTestType(event.target.value)
+                                    setSelectedTestTypeName(event.target.value)
                                 }}
                             >
                                 <option>Select a test execution type</option>
                                 {testExecutionTypes.map((testType) => (
-                                    <option key={testType.name} value={testType.name}>
+                                    <option key={testType.field} value={testType.name}>
                                         {testType.name}
                                     </option>
                                 ))}
@@ -91,7 +100,7 @@ const TestCategorySelector = () => {
                                     type="submit"
                                     className="bg-black text-white font-bold p-2 rounded-full w-28 outline-none"
                                     onClick={() => {
-                                        navigateToNextPage(testType)
+                                        navigateToNextPage(selectedTestTypeName)
                                     }}
                                 >
                                     Next

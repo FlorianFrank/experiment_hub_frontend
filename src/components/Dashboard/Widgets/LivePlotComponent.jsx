@@ -71,7 +71,6 @@ const LivePlotComponent = () => {
     };
 
     const setChartOptions = () => {
-        console.log("ENTER SET CHART OPTIONS")
         fetch_get(FETCH_LIVE_PLOT_PROPERTIES, (value) => {
             setAlertIsSet(value)
         }, (value) => {
