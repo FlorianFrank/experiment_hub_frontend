@@ -145,6 +145,16 @@ const Tests = () => {
                         color="#ffc107"
                         type="Row Hammering Tests"
                         category='memory'
+                    />],
+                    [4, <TestLayout
+                        color="#ffc107"
+                        type="DRAM Retention Tests"
+                        category='memory'
+                    />],
+                        [5, <TestLayout
+                        color="#ffc107"
+                        type="SRAM Startup Tests"
+                        category='memory'
                     />]
                 ]}
             /> : <Spinner message="Fetching tests"/>}

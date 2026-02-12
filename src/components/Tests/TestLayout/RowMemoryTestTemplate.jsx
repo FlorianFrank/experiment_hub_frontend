@@ -360,7 +360,7 @@ const RowMemoryTestTemplate = (props) => {
                                     onChange={handleOptionChange}
                                 >
                                     <option value="Select Board"/>
-                                    {devices.filter(device => device.type === 'nanosec_container' && device.status === 'online').map(device => (
+                                    {devices.filter(device => device.type === 'fpga' ||  device.type === 'nanosec_container' && device.status === 'online').map(device => (
                                         <option key={device.id} value={device.id}>
                                             {device.name}
                                         </option>
